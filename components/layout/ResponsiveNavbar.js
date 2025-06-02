@@ -118,7 +118,7 @@ const ResponsiveNavbar = () => {
                     </Link>
                     {user.role === "admin" && (
                       <Link
-                        href="/admin/dashboard"
+                        href="/dashboard"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-orange-600 dark:hover:text-orange-400"
                         onClick={() => setShowProfileDropdown(false)}
                       >
@@ -235,7 +235,7 @@ const ResponsiveNavbar = () => {
                   </Link>
                   {user.role === "admin" && (
                     <Link
-                      href="/admin/dashboard"
+                      href="/dashboard"
                       onClick={closeMenu}
                       className="block w-full text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                     >

@@ -38,6 +38,7 @@ export default function ProtectedRoute({
     getNextVerificationStep,
     router,
   ]);
+  console.log(user)
 
   if (isLoading) {
     return (

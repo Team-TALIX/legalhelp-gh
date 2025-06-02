@@ -1,7 +1,6 @@
-import "./globals.css"; // Assuming Tailwind base styles are here
-import { Inter, Playfair_Display } from "next/font/google"; // Example fonts from scraped UI
-import { AuthProvider } from "../hooks/useAuth"; // Import AuthProvider
-import { ThemeProvider } from "../providers/ThemeProvider";
+import "./globals.css";
+import { Inter, Playfair_Display } from "next/font/google";
+import { Providers } from "./providers";
 import ResponsiveNavbar from "../components/layout/ResponsiveNavbar";
 import NavigationProgress from "../components/ui/NavigationProgress";
 import Footer from "../components/layout/Footer";
@@ -28,16 +27,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfairDisplay.variable}`}>
       <body>
-        <ThemeProvider>
-          <AuthProvider>
-            <NavigationProgress />
-            <ResponsiveNavbar />
-            <main className="container mx-auto px-4 py-8 min-h-screen">
-              {children}
-            </main>
-            <Footer />
-          </AuthProvider>
-        </ThemeProvider>
+        <Providers>
+          <NavigationProgress />
+          <ResponsiveNavbar />
+          <main className="container mx-auto px-4 py-8 min-h-screen">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

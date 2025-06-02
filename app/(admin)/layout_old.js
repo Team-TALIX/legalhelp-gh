@@ -6,7 +6,6 @@ import { useAuth } from "../../hooks/useAuth";
 import ProtectedRoute from "../../components/auth/ProtectedRoute";
 import Spinner from "../../components/ui/Spinner";
 import useAdmin from "../../hooks/useAdmin";
-import NotificationCenter from "../../components/admin/NotificationCenter";
 import {
   MdDashboard,
   MdPeople,
@@ -26,12 +25,11 @@ export default function AdminLayout({ children }) {
   const { user, isLoading } = useAuth();
   const { useNotifications, useSystemHealth } = useAdmin();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notificationCenterOpen, setNotificationCenterOpen] = useState(false);
 
   // Fetch notifications and system health
   const { data: response = {} } = useNotifications();
   const notifications = response.data || [];
-
+  
   const { data: systemHealth } = useSystemHealth();
 
   useEffect(() => {
@@ -78,13 +76,8 @@ export default function AdminLayout({ children }) {
       href: "/moderation",
       icon: MdSecurity,
       current: pathname === "/moderation",
-      badge:
-        notifications?.filter(
-          (n) =>
-            (n.type === "content_pending" ||
-              n.type === "moderation_required") &&
-            !n.isRead
-        ).length || 0,
+      badge: notifications?.filter((n) => n.type === "moderation" && !n.read)
+        .length,
     },
     {
       name: "Analytics",
@@ -151,16 +144,14 @@ export default function AdminLayout({ children }) {
 
               {/* Right side notifications and user menu */}
               <div className="flex items-center space-x-4">
-                {/* Notifications center */}
-                <div className="relative">
-                  <NotificationCenter
-                    isOpen={notificationCenterOpen}
-                    onClose={() => setNotificationCenterOpen(false)}
-                    onToggle={() =>
-                      setNotificationCenterOpen(!notificationCenterOpen)
-                    }
-                  />
-                </div>
+                {/* Notifications bell */}
+                <button className="relative p-2 text-gray-400 hover:text-gray-500">
+                  <span className="sr-only">View notifications</span>
+                  <MdNotifications className="h-6 w-6" />
+                  {notifications.filter((n) => !n.read).length > 0 && (
+                    <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-400" />
+                  )}
+                </button>
 
                 {/* User avatar */}
                 <div className="flex items-center space-x-3">
