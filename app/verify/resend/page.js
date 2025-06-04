@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "../../../components/ui/Button";
@@ -133,132 +133,134 @@ const ResendVerificationPage = memo(function ResendVerificationPage() {
   ]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Resend Verification
-          </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Request a new verification email or SMS code
-          </p>
-        </div>
-
-        <div className="flex mb-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-          <button
-            className={`flex-1 py-2 px-4 focus:outline-none transition-colors ${
-              verificationMethod === "email"
-                ? "bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-            }`}
-            onClick={() => handleVerificationMethodChange("email")}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <FaEnvelope />
-              <span>Email</span>
-            </div>
-          </button>
-          <button
-            className={`flex-1 py-2 px-4 focus:outline-none transition-colors ${
-              verificationMethod === "phone"
-                ? "bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-            }`}
-            onClick={() => handleVerificationMethodChange("phone")}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <FaMobile />
-              <span>Phone</span>
-            </div>
-          </button>
-        </div>
-
-        {message && (
-          <div
-            className={`p-3 mb-4 rounded-md text-sm ${
-              messageType === "success"
-                ? "bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200"
-                : "bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200"
-            }`}
-          >
-            {message}
+    <Suspense fallback={<Spinner />}>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Resend Verification
+            </h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
+              Request a new verification email or SMS code
+            </p>
           </div>
-        )}
 
-        <div className="space-y-4">
-          {verificationMethod === "email" ? (
-            <>
+          <div className="flex mb-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              className={`flex-1 py-2 px-4 focus:outline-none transition-colors ${
+                verificationMethod === "email"
+                  ? "bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              }`}
+              onClick={() => handleVerificationMethodChange("email")}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <FaEnvelope />
+                <span>Email</span>
+              </div>
+            </button>
+            <button
+              className={`flex-1 py-2 px-4 focus:outline-none transition-colors ${
+                verificationMethod === "phone"
+                  ? "bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              }`}
+              onClick={() => handleVerificationMethodChange("phone")}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <FaMobile />
+                <span>Phone</span>
+              </div>
+            </button>
+          </div>
+
+          {message && (
+            <div
+              className={`p-3 mb-4 rounded-md text-sm ${
+                messageType === "success"
+                  ? "bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200"
+                  : "bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200"
+              }`}
+            >
+              {message}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {verificationMethod === "email" ? (
+              <>
+                <Input
+                  label="Email Address"
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={handleEmailChange}
+                  disabled={authLoading || verificationSent}
+                  required
+                />
+                {verificationSent && (
+                  <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                    <FaCheckCircle />
+                    <span>Verification email sent!</span>
+                  </div>
+                )}
+              </>
+            ) : (
               <Input
-                label="Email Address"
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={handleEmailChange}
-                disabled={authLoading || verificationSent}
+                label="Phone Number"
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                placeholder="Enter your phone number"
+                value={phone}
+                onChange={handlePhoneChange}
+                disabled={authLoading}
                 required
               />
-              {verificationSent && (
-                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                  <FaCheckCircle />
-                  <span>Verification email sent!</span>
-                </div>
-              )}
-            </>
-          ) : (
-            <Input
-              label="Phone Number"
-              id="phone"
-              name="phone"
-              type="tel"
-              autoComplete="tel"
-              placeholder="Enter your phone number"
-              value={phone}
-              onChange={handlePhoneChange}
-              disabled={authLoading}
-              required
-            />
-          )}
-        </div>
-
-        <div className="mt-6 flex flex-col gap-4">
-          <Button
-            variant="primary"
-            onClick={handleResendVerification}
-            disabled={
-              authLoading ||
-              (verificationMethod === "email" && verificationSent)
-            }
-            className="w-full flex justify-center items-center"
-          >
-            {authLoading ? (
-              <Spinner size="sm" />
-            ) : (
-              `Send Verification ${
-                verificationMethod === "email" ? "Email" : "Code"
-              }`
             )}
-          </Button>
+          </div>
 
-          <div className="flex justify-between">
-            <Link href="/login">
-              <Button variant="text" size="sm">
-                Back to Login
-              </Button>
-            </Link>
-            {verificationMethod === "phone" && verificationSent && (
-              <Link href={`/verify/phone?phone=${encodeURIComponent(phone)}`}>
+          <div className="mt-6 flex flex-col gap-4">
+            <Button
+              variant="primary"
+              onClick={handleResendVerification}
+              disabled={
+                authLoading ||
+                (verificationMethod === "email" && verificationSent)
+              }
+              className="w-full flex justify-center items-center"
+            >
+              {authLoading ? (
+                <Spinner size="sm" />
+              ) : (
+                `Send Verification ${
+                  verificationMethod === "email" ? "Email" : "Code"
+                }`
+              )}
+            </Button>
+
+            <div className="flex justify-between">
+              <Link href="/login">
                 <Button variant="text" size="sm">
-                  Enter Verification Code
+                  Back to Login
                 </Button>
               </Link>
-            )}
+              {verificationMethod === "phone" && verificationSent && (
+                <Link href={`/verify/phone?phone=${encodeURIComponent(phone)}`}>
+                  <Button variant="text" size="sm">
+                    Enter Verification Code
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Suspense>
   );
 });
 

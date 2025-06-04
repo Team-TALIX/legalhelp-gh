@@ -293,18 +293,20 @@ const VerifyPhonePage = memo(function VerifyPhonePage() {
   ]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 text-center">
-        <div className="flex justify-center mb-6">
-          <div className="rounded-full bg-primary-100 dark:bg-primary-900 p-4">
-            <FaMobile className="h-10 w-10 text-primary-600 dark:text-primary-300" />
+    <Suspense fallback={<Spinner />}>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 text-center">
+          <div className="flex justify-center mb-6">
+            <div className="rounded-full bg-primary-100 dark:bg-primary-900 p-4">
+              <FaMobile className="h-10 w-10 text-primary-600 dark:text-primary-300" />
+            </div>
           </div>
+          
+            {renderContent()}
+          
         </div>
-        <Suspense fallback={<Spinner />}>
-          {renderContent()}
-        </Suspense>
       </div>
-    </div>
+    </Suspense>
   );
 });
 
