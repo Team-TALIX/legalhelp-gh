@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
@@ -300,7 +300,9 @@ const VerifyPhonePage = memo(function VerifyPhonePage() {
             <FaMobile className="h-10 w-10 text-primary-600 dark:text-primary-300" />
           </div>
         </div>
-        {renderContent()}
+        <Suspense fallback={<Spinner />}>
+          {renderContent()}
+        </Suspense>
       </div>
     </div>
   );

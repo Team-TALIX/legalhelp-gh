@@ -42,20 +42,10 @@ export default function useChat(preferredLanguage = "en") {
 
   // Create a new chat session
   const createSessionMutation = useMutation({
-    mutationFn: (sessionData = {}) => {
-      const data = {
-        name: sessionData.name || "", // Let backend generate default if empty
-        language: preferredLanguage,
-        context: sessionData.context || {
-          legalTopic: "",
-          userLocation: "",
-          resolved: false,
-        },
-        isAnonymous: !user,
-      };
+    mutationFn: (context = {}) => {
       return apiCall("/chat/sessions", {
         method: "POST",
-        data,
+        data: { context },
       });
     },
     onSuccess: (data) => {
@@ -83,7 +73,6 @@ export default function useChat(preferredLanguage = "en") {
   // Send a chat query
   const sendMessageMutation = useMutation({
     mutationFn: ({ content, context = {}, isVoiceInput = false }) => {
-      console.log(content, context)
       if (!sessionId) {
         throw new Error("No active session");
       }
@@ -235,36 +224,22 @@ export default function useChat(preferredLanguage = "en") {
     // Only create session if:
     // 1. No current session exists
     // 2. No session creation is pending
-    // 3. User exists (no anonymous sessions for now)
+    // 3. User exists OR we allow anonymous sessions
     // 4. Not already initialized
     // 5. Enough time has passed since last attempt
-    // 6. No existing sessions (let user manually create first session)
     if (
       !sessionId &&
       !createSessionMutation.isPending &&
       !isInitialized &&
-      timeSinceLastAttempt > 5000 && // Increased delay
+      timeSinceLastAttempt > 2000 &&
       user &&
-      !(sessionsData?.sessions && sessionsData.sessions.length > 0) &&
-      typeof window !== "undefined" // Ensure we're on client side
+      !(sessionsData?.sessions && sessionsData.sessions.length > 0)
     ) {
-      console.log("Auto-creating first chat session for user");
+      console.log("Creating new chat session");
       setLastSessionCreationAttempt(now);
-      createSessionMutation.mutate({
-        context: {
-          legalTopic: "",
-          userLocation: "",
-          resolved: false,
-        },
-      });
+      createSessionMutation.mutate({});
     }
-  }, [
-    sessionId,
-    isInitialized,
-    lastSessionCreationAttempt,
-    user,
-    sessionsData?.sessions,
-  ]);
+  }, [sessionId, isInitialized, lastSessionCreationAttempt]);
   // Helper functions
   const sendMessage = useCallback(
     async (content, context = {}) => {
@@ -339,19 +314,6 @@ export default function useChat(preferredLanguage = "en") {
     [updateSessionMutation]
   );
 
-  const updateSessionName = useCallback(
-    async (newName) => {
-      try {
-        await updateSessionMutation.mutateAsync({ name: newName });
-        // Refresh sessions list to show updated name
-        queryClient.invalidateQueries(["chat", "sessions", user?._id]);
-      } catch (error) {
-        throw error;
-      }
-    },
-    [updateSessionMutation, queryClient, user]
-  );
-
   const deleteSession = useCallback(async () => {
     try {
       await deleteSessionMutation.mutateAsync();
@@ -361,7 +323,7 @@ export default function useChat(preferredLanguage = "en") {
   }, [deleteSessionMutation]);
 
   const createNewSession = useCallback(
-    async (sessionData = {}) => {
+    async (context = {}) => {
       const now = Date.now();
       const timeSinceLastAttempt = lastSessionCreationAttempt
         ? now - lastSessionCreationAttempt
@@ -374,7 +336,7 @@ export default function useChat(preferredLanguage = "en") {
 
       try {
         setLastSessionCreationAttempt(now);
-        await createSessionMutation.mutateAsync(sessionData);
+        await createSessionMutation.mutateAsync(context);
       } catch (error) {
         throw error;
       }
@@ -448,7 +410,6 @@ export default function useChat(preferredLanguage = "en") {
     // Feedback and updates
     submitFeedback,
     updateSessionContext,
-    updateSessionName,
 
     // Mutation states for UI feedback
     isCreatingSession: createSessionMutation.isPending,

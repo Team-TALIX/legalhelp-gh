@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "../../../components/ui/Button";
@@ -212,7 +212,9 @@ const VerifyEmailPage = memo(function VerifyEmailPage() {
             <FaEnvelope className="h-10 w-10 text-primary-600 dark:text-primary-300" />
           </div>
         </div>
-        {renderContent()}
+        <Suspense fallback={<Spinner />}>
+          {renderContent()}
+        </Suspense>
       </div>
     </div>
   );

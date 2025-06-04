@@ -10,24 +10,17 @@ export function Providers({ children }) {
   const [mounted, setMounted] = useState(false);
   const [queryClient] = useState(
     () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 5 * 60 * 1000, // 5 minutes
-            retry: 1,
-          },
-        },
-      })
+      new QueryClient()
   );
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Prevent hydration mismatch by not rendering on server
+  // Prevent hydration mismatch by not rendering client-only providers on server
   if (!mounted) {
     return (
-      <div>
+      <div className="min-h-screen">
         <AuthProvider>{children}</AuthProvider>
       </div>
     );

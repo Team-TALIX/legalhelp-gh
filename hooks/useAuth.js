@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [mounted, setMounted] = useState(false);
   const [verificationState, setVerificationState] = useState({
     emailVerificationSent: false,
     phoneVerificationSent: false,
@@ -36,7 +37,14 @@ export const AuthProvider = ({ children }) => {
     verificationRequestInProgress: false,
   });
 
+  // Mark as mounted to prevent hydration issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const initializeAuth = useCallback(async () => {
+    if (!mounted) return;
+
     setIsLoading(true);
     setError(null);
     const accessToken = getAccessToken();
@@ -66,11 +74,13 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
     }
     setIsLoading(false);
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
-    initializeAuth();
-  }, [initializeAuth]);
+    if (mounted) {
+      initializeAuth();
+    }
+  }, [initializeAuth, mounted]);
 
   const login = useCallback(async (email, password) => {
     setIsLoading(true);
@@ -159,12 +169,7 @@ export const AuthProvider = ({ children }) => {
       verificationRequestInProgress: false,
     });
     setIsLoading(false);
-  }, [
-    setIsLoading,
-    setError,
-    setUser,
-    setVerificationState,
-  ]); // Added dependencies
+  }, [setIsLoading, setError, setUser, setVerificationState]); // Added dependencies
 
   const isEmailVerified = useCallback(
     () => !!user?.isEmailVerified,

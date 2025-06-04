@@ -4,7 +4,23 @@ import { useTheme } from "../../providers/ThemeProvider";
 import { FaSun, FaMoon, FaDesktop } from "react-icons/fa";
 
 const ThemeToggle = ({ className = "" }) => {
-  const { theme, resolvedTheme, toggleTheme } = useTheme();
+  const { theme, resolvedTheme, toggleTheme, mounted } = useTheme();
+
+  // Don't render anything on server to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div
+        className={`
+          flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium
+          text-gray-700 dark:text-gray-300
+          ${className}
+        `}
+      >
+        <div className="w-4 h-4 animate-pulse bg-gray-300 dark:bg-gray-600 rounded" />
+        <span className="hidden sm:inline w-12 h-4 animate-pulse bg-gray-300 dark:bg-gray-600 rounded" />
+      </div>
+    );
+  }
 
   const getIcon = () => {
     switch (theme) {

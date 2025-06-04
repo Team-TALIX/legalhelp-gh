@@ -9,7 +9,10 @@ import Spinner from "../ui/Spinner";
 import useChat from "../../hooks/useChat";
 import { FaPaperPlane, FaExclamationTriangle } from "react-icons/fa";
 
-export default function ChatInterface({ selectedLanguage = "en", isAudioEnabled = false }) {
+export default function ChatInterface({
+  selectedLanguage = "en",
+  isAudioEnabled = false,
+}) {
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef(null);
   const {
@@ -88,9 +91,12 @@ export default function ChatInterface({ selectedLanguage = "en", isAudioEnabled 
               Session: {sessionId.substring(0, 8)}...
             </div>
           )}
-          <div className={`w-3 h-3 rounded-full ${
-            sessionId ? "bg-green-500" : "bg-red-500"
-          }`} title={sessionId ? "Connected" : "Disconnected"} />
+          <div
+            className={`w-3 h-3 rounded-full ${
+              sessionId ? "bg-green-500" : "bg-red-500"
+            }`}
+            title={sessionId ? "Connected" : "Disconnected"}
+          />
         </div>
       </div>
 
@@ -98,7 +104,10 @@ export default function ChatInterface({ selectedLanguage = "en", isAudioEnabled 
       {error && (
         <div className="mx-4 mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
           <div className="flex items-start">
-            <FaExclamationTriangle className="text-red-600 dark:text-red-400 mt-0.5 mr-2 flex-shrink-0" size={16} />
+            <FaExclamationTriangle
+              className="text-red-600 dark:text-red-400 mt-0.5 mr-2 flex-shrink-0"
+              size={16}
+            />
             <div className="flex-1">
               <p className="text-red-800 dark:text-red-200 text-sm">{error}</p>
             </div>
@@ -149,7 +158,8 @@ export default function ChatInterface({ selectedLanguage = "en", isAudioEnabled 
                 Welcome to LegalHelp GH
               </h2>
               <p className="mb-4">
-                Ask any legal question and get clear answers in your preferred language.
+                Ask any legal question and get clear answers in your preferred
+                language.
               </p>
               <div className="text-sm space-y-1">
                 <p>• Tenant and landlord rights</p>
@@ -191,7 +201,7 @@ export default function ChatInterface({ selectedLanguage = "en", isAudioEnabled 
 
       {/* Input area */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <form onSubmit={handleSubmit} className="flex items-end space-x-3">
+        <form onSubmit={handleSubmit} className="flex items-center space-x-3">
           <VoiceRecorder
             onAudioReady={handleVoiceMessage}
             language={selectedLanguage}
@@ -207,12 +217,10 @@ export default function ChatInterface({ selectedLanguage = "en", isAudioEnabled 
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={
-                sessionId
-                  ? "Type your legal question..."
-                  : "Connecting..."
+                sessionId ? "Type your legal question..." : "Connecting..."
               }
               disabled={!sessionId || isSending}
-              className="mb-0"
+              className="mb-0 h-10"
             />
           </div>
 
@@ -220,7 +228,7 @@ export default function ChatInterface({ selectedLanguage = "en", isAudioEnabled 
             type="submit"
             disabled={!sessionId || isSending || inputMessage.trim() === ""}
             variant="primary"
-            className="flex items-center space-x-2 px-4 py-2"
+            className="flex items-center space-x-2 px-4 py-2 h-10 flex-shrink-0"
           >
             {isSending ? (
               <Spinner size="sm" />
