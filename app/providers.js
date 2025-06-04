@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AuthProvider } from "../hooks/useAuth";
 import { ThemeProvider } from "../providers/ThemeProvider";
+import Spinner from "@/components/ui/Spinner";
 
 export function Providers({ children }) {
   const [mounted, setMounted] = useState(false);
@@ -27,13 +28,15 @@ export function Providers({ children }) {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          {children}
-          {process.env.NODE_ENV === "development" && <ReactQueryDevtools />}
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <Suspense fallback={<Spinner />}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+            {process.env.NODE_ENV === "development" && <ReactQueryDevtools />}
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </Suspense>
   );
 }
