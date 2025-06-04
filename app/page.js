@@ -12,6 +12,7 @@ import {
   FaLightbulb,
   FaUserCircle,
 } from "react-icons/fa";
+import Spinner from "@/components/ui/Spinner";
 
 // Hero Section Component
 const HeroSection = () => {
@@ -334,7 +335,7 @@ const CallToActionSection = () => {
 
 export default function HomePage() {
   return (
-    <Suspense fallback={<Suspense />}>
+    <Suspense fallback={<Spinner />}>
       <div className="theme-transition">
         <HeroSection />
         <FeaturesSection />
