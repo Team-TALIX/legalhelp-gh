@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
-import Button from "../../components/ui/Button";
+import Button from "../components/ui/Button";
 import { useRouter } from "next/navigation";
 import { FaLock, FaHome, FaSignInAlt } from "react-icons/fa";
 
