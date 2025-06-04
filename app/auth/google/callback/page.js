@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../../../hooks/useAuth"; // Adjust path as necessary
 import { storeTokens } from "../../../../lib/auth"; // Adjust path as necessary
+import Spinner from "@/components/ui/Spinner";
 
 export default function GoogleCallbackPage() {
   const router = useRouter();
@@ -69,17 +70,19 @@ export default function GoogleCallbackPage() {
   }, [user, isLoading, router, searchParams]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl text-center">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-          Processing Google Sign-in...
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Please wait while we securely sign you in. You will be redirected
-          shortly.
-        </p>
-        {/* Optional: Add a spinner or loading animation here */}
+    <Suspense fallback={<Spinner />}>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl text-center">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            Processing Google Sign-in...
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Please wait while we securely sign you in. You will be redirected
+            shortly.
+          </p>
+          {/* Optional: Add a spinner or loading animation here */}
+        </div>
       </div>
-    </div>
+    </Suspense>
   );
 }

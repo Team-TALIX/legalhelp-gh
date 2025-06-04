@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import {
   FiDownload,
   FiCalendar,
@@ -205,313 +205,315 @@ const AnalyticsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Analytics Dashboard
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Comprehensive insights into platform usage and performance
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                {periods.map((period) => (
-                  <option key={period.value} value={period.value}>
-                    {period.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={exportFormat}
-                onChange={(e) => setExportFormat(e.target.value)}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="csv">CSV</option>
-                <option value="xlsx">Excel</option>
-                <option value="pdf">PDF</option>
-              </select>
-              <Button
-                onClick={handleExport}
-                disabled={loading}
-                className="flex items-center gap-2"
-              >
-                {loading ? <Spinner /> : <FiDownload className="w-4 h-4" />}
-                Export
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatsCard
-            title="Total Users"
-            value={
-              dashboardData?.data?.users?.total ||
-              mockAnalytics.overview.totalUsers
-            }
-            trend="+12.5%"
-            icon={FiUsers}
-            color="blue"
-            loading={dashboardLoading}
-          />
-          <StatsCard
-            title="Active Users"
-            value={
-              dashboardData?.data?.users?.active ||
-              mockAnalytics.overview.activeUsers
-            }
-            trend="+8.3%"
-            icon={FiActivity}
-            color="green"
-            loading={dashboardLoading}
-          />
-          <StatsCard
-            title="Total Queries"
-            value={
-              dashboardData?.data?.usage?.totalQueries ||
-              mockAnalytics.overview.totalQueries
-            }
-            trend="+15.7%"
-            icon={FiMessageSquare}
-            color="purple"
-            loading={dashboardLoading}
-          />
-          <StatsCard
-            title="Voice Queries"
-            value={
-              dashboardData?.data?.usage?.totalVoiceQueries ||
-              mockAnalytics.overview.voiceQueries
-            }
-            trend="+22.1%"
-            icon={FiMic}
-            color="orange"
-            loading={dashboardLoading}
-          />
-        </div>
-
-        {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* User Growth Chart */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                User Growth
-              </h3>
-              <FiTrendingUp className="w-5 h-5 text-green-500" />
-            </div>
-            {userAnalyticsLoading ? (
-              <div className="flex items-center justify-center h-48">
-                <Spinner />
+    <Suspense fallback={<Spinner />}>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Analytics Dashboard
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Comprehensive insights into platform usage and performance
+                </p>
               </div>
-            ) : (
-              <>
-                <SimpleChart
-                  data={userAnalytics?.data || mockAnalytics.userGrowth}
-                  type="line"
-                />
-                <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                  <p>Daily new user registrations over the selected period</p>
-                  {userAnalytics?.data && (
-                    <p className="text-xs mt-1">
-                      Showing {userAnalytics.data.length} data points for{" "}
-                      {selectedPeriod}
-                    </p>
-                  )}
-                </div>
-              </>
-            )}
+              <div className="flex gap-3">
+                <select
+                  value={selectedPeriod}
+                  onChange={(e) => setSelectedPeriod(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {periods.map((period) => (
+                    <option key={period.value} value={period.value}>
+                      {period.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={exportFormat}
+                  onChange={(e) => setExportFormat(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="csv">CSV</option>
+                  <option value="xlsx">Excel</option>
+                  <option value="pdf">PDF</option>
+                </select>
+                <Button
+                  onClick={handleExport}
+                  disabled={loading}
+                  className="flex items-center gap-2"
+                >
+                  {loading ? <Spinner /> : <FiDownload className="w-4 h-4" />}
+                  Export
+                </Button>
+              </div>
+            </div>
           </div>
 
-          {/* Language Distribution */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Language Distribution
-              </h3>
-              <FiGlobe className="w-5 h-5 text-blue-500" />
-            </div>
-            <SimpleChart data={mockAnalytics.languageBreakdown} type="pie" />
-            <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-              {Object.entries(mockAnalytics.languageBreakdown).map(
-                ([lang, percentage]) => (
-                  <div key={lang} className="flex justify-between">
-                    <span className="capitalize text-gray-600 dark:text-gray-400">
-                      {lang}:
-                    </span>
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {percentage}%
-                    </span>
+          {/* Overview Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <StatsCard
+              title="Total Users"
+              value={
+                dashboardData?.data?.users?.total ||
+                mockAnalytics.overview.totalUsers
+              }
+              trend="+12.5%"
+              icon={FiUsers}
+              color="blue"
+              loading={dashboardLoading}
+            />
+            <StatsCard
+              title="Active Users"
+              value={
+                dashboardData?.data?.users?.active ||
+                mockAnalytics.overview.activeUsers
+              }
+              trend="+8.3%"
+              icon={FiActivity}
+              color="green"
+              loading={dashboardLoading}
+            />
+            <StatsCard
+              title="Total Queries"
+              value={
+                dashboardData?.data?.usage?.totalQueries ||
+                mockAnalytics.overview.totalQueries
+              }
+              trend="+15.7%"
+              icon={FiMessageSquare}
+              color="purple"
+              loading={dashboardLoading}
+            />
+            <StatsCard
+              title="Voice Queries"
+              value={
+                dashboardData?.data?.usage?.totalVoiceQueries ||
+                mockAnalytics.overview.voiceQueries
+              }
+              trend="+22.1%"
+              icon={FiMic}
+              color="orange"
+              loading={dashboardLoading}
+            />
+          </div>
+
+          {/* Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* User Growth Chart */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  User Growth
+                </h3>
+                <FiTrendingUp className="w-5 h-5 text-green-500" />
+              </div>
+              {userAnalyticsLoading ? (
+                <div className="flex items-center justify-center h-48">
+                  <Spinner />
+                </div>
+              ) : (
+                <>
+                  <SimpleChart
+                    data={userAnalytics?.data || mockAnalytics.userGrowth}
+                    type="line"
+                  />
+                  <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                    <p>Daily new user registrations over the selected period</p>
+                    {userAnalytics?.data && (
+                      <p className="text-xs mt-1">
+                        Showing {userAnalytics.data.length} data points for{" "}
+                        {selectedPeriod}
+                      </p>
+                    )}
                   </div>
-                )
+                </>
               )}
             </div>
-          </div>
-        </div>
 
-        {/* Top Legal Topics */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Top Legal Topics
-            </h3>
-            <FiBarChart className="w-5 h-5 text-purple-500" />
-          </div>
-          <div className="space-y-4">
-            {mockAnalytics.topTopics.map((topic, index) => (
-              <div
-                key={topic.topic}
-                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center font-medium text-sm">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">
-                      {topic.topic}
-                    </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {topic.queries.toLocaleString()} queries
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  {getGrowthIndicator(topic.growth)}
-                </div>
+            {/* Language Distribution */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Language Distribution
+                </h3>
+                <FiGlobe className="w-5 h-5 text-blue-500" />
               </div>
-            ))}
+              <SimpleChart data={mockAnalytics.languageBreakdown} type="pie" />
+              <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                {Object.entries(mockAnalytics.languageBreakdown).map(
+                  ([lang, percentage]) => (
+                    <div key={lang} className="flex justify-between">
+                      <span className="capitalize text-gray-600 dark:text-gray-400">
+                        {lang}:
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {percentage}%
+                      </span>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Regional Data & Query Patterns */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Regional Distribution */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-              Regional Distribution
-            </h3>
-            <div className="space-y-3">
-              {mockAnalytics.regionalData.map((region) => (
+          {/* Top Legal Topics */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Top Legal Topics
+              </h3>
+              <FiBarChart className="w-5 h-5 text-purple-500" />
+            </div>
+            <div className="space-y-4">
+              {mockAnalytics.topTopics.map((topic, index) => (
                 <div
-                  key={region.region}
-                  className="flex items-center justify-between"
+                  key={topic.topic}
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-4 h-4 bg-blue-500 rounded"
-                      style={{
-                        width: `${Math.max(region.percentage * 0.8, 8)}px`,
-                      }}
-                    ></div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {region.region}
-                    </span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center font-medium text-sm">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">
+                        {topic.topic}
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {topic.queries.toLocaleString()} queries
+                      </p>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      {region.users.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {region.percentage}%
-                    </div>
+                    {getGrowthIndicator(topic.growth)}
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Query Patterns */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-              Query Patterns
-            </h3>
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Daily Distribution
-                </h4>
-                <div className="space-y-2">
-                  {mockAnalytics.queryPatterns.daily.map((day) => (
-                    <div
-                      key={day.day}
-                      className="flex items-center justify-between text-sm"
-                    >
-                      <span className="text-gray-600 dark:text-gray-400">
-                        {day.day}
+          {/* Regional Data & Query Patterns */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Regional Distribution */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+                Regional Distribution
+              </h3>
+              <div className="space-y-3">
+                {mockAnalytics.regionalData.map((region) => (
+                  <div
+                    key={region.region}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-4 h-4 bg-blue-500 rounded"
+                        style={{
+                          width: `${Math.max(region.percentage * 0.8, 8)}px`,
+                        }}
+                      ></div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {region.region}
                       </span>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="h-2 bg-purple-400 rounded"
-                          style={{ width: `${(day.queries / 8000) * 80}px` }}
-                        ></div>
-                        <span className="text-gray-900 dark:text-white w-12 text-right">
-                          {(day.queries / 1000).toFixed(1)}k
-                        </span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium text-gray-900 dark:text-white">
+                        {region.users.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {region.percentage}%
                       </div>
                     </div>
-                  ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Query Patterns */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+                Query Patterns
+              </h3>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Daily Distribution
+                  </h4>
+                  <div className="space-y-2">
+                    {mockAnalytics.queryPatterns.daily.map((day) => (
+                      <div
+                        key={day.day}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {day.day}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-2 bg-purple-400 rounded"
+                            style={{ width: `${(day.queries / 8000) * 80}px` }}
+                          ></div>
+                          <span className="text-gray-900 dark:text-white w-12 text-right">
+                            {(day.queries / 1000).toFixed(1)}k
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Performance Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
+                  {mockAnalytics.overview.querySuccessRate}%
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  Query Success Rate
+                </div>
+                <div className="text-xs text-green-600 dark:text-green-400">
+                  +2.1% from last period
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                  {mockAnalytics.overview.averageSessionDuration}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  Avg. Session Duration
+                </div>
+                <div className="text-xs text-blue-600 dark:text-blue-400">
+                  +8.5% from last period
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                  {mockAnalytics.overview.userSatisfaction}/5
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  User Satisfaction
+                </div>
+                <div className="text-xs text-purple-600 dark:text-purple-400">
+                  +0.3 from last period
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Performance Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-                {mockAnalytics.overview.querySuccessRate}%
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                Query Success Rate
-              </div>
-              <div className="text-xs text-green-600 dark:text-green-400">
-                +2.1% from last period
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                {mockAnalytics.overview.averageSessionDuration}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                Avg. Session Duration
-              </div>
-              <div className="text-xs text-blue-600 dark:text-blue-400">
-                +8.5% from last period
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
-                {mockAnalytics.overview.userSatisfaction}/5
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                User Satisfaction
-              </div>
-              <div className="text-xs text-purple-600 dark:text-purple-400">
-                +0.3 from last period
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-    </div>
+    </Suspense>
   );
 };
 

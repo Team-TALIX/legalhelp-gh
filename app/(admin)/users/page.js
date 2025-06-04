@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import {
   FiSearch,
   FiFilter,
@@ -338,401 +338,411 @@ const UsersPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                User Management
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Manage users, roles, and permissions
-              </p>
+    <Suspense fallback={<Spinner />}>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  User Management
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Manage users, roles, and permissions
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <select
+                  value={exportFormat}
+                  onChange={(e) => setExportFormat(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="csv">CSV</option>
+                  <option value="xlsx">Excel</option>
+                </select>
+                <Button
+                  onClick={handleExport}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <FiDownload className="w-4 h-4" />
+                  Export
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-3">
+          </div>
+
+          {/* Filters */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+              <Input
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                icon={FiSearch}
+              />
               <select
-                value={exportFormat}
-                onChange={(e) => setExportFormat(e.target.value)}
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <option value="csv">CSV</option>
-                <option value="xlsx">Excel</option>
+                <option value="">All Roles</option>
+                {roles.map((role) => (
+                  <option key={role} value={role}>
+                    {role.replace("_", " ").toUpperCase()}
+                  </option>
+                ))}
               </select>
-              <Button
-                onClick={handleExport}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <FiDownload className="w-4 h-4" />
-                Export
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-            <Input
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              icon={FiSearch}
-            />
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              <option value="">All Roles</option>
-              {roles.map((role) => (
-                <option key={role} value={role}>
-                  {role.replace("_", " ").toUpperCase()}
-                </option>
-              ))}
-            </select>
-            <select
-              value={verificationFilter}
-              onChange={(e) => setVerificationFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              <option value="">All Users</option>
-              <option value="verified">Verified Only</option>
-              <option value="unverified">Unverified Only</option>
-            </select>
-            <select
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              <option value={10}>10 per page</option>
-              <option value={20}>20 per page</option>
-              <option value={50}>50 per page</option>
-              <option value={100}>100 per page</option>
-            </select>
-          </div>
-
-          {/* Bulk Actions */}
-          {selectedUsers.length > 0 && (
-            <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {selectedUsers.length} users selected
-              </span>
               <select
-                value={bulkAction}
-                onChange={(e) => setBulkAction(e.target.value)}
-                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                value={verificationFilter}
+                onChange={(e) => setVerificationFilter(e.target.value)}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <option value="">Choose bulk action...</option>
-                <option value="activate">Activate Users</option>
-                <option value="deactivate">Deactivate Users</option>
-                <option value="verify">Mark as Verified</option>
-                <option value="promote_paid">Promote to Premium</option>
-                <option value="demote_user">Demote to User</option>
-                <option value="export_selected">Export Selected</option>
+                <option value="">All Users</option>
+                <option value="verified">Verified Only</option>
+                <option value="unverified">Unverified Only</option>
               </select>
-              <Button
-                onClick={handleBulkAction}
-                variant="secondary"
-                className="text-sm"
-                disabled={!bulkAction}
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                Apply Action
-              </Button>
+                <option value={10}>10 per page</option>
+                <option value={20}>20 per page</option>
+                <option value={50}>50 per page</option>
+                <option value={100}>100 per page</option>
+              </select>
             </div>
-          )}
-        </div>
 
-        {/* Users Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th className="w-8 px-6 py-3 text-left">
-                    <input
-                      type="checkbox"
-                      checked={
-                        selectedUsers.length === filteredUsers.length &&
-                        filteredUsers.length > 0
-                      }
-                      onChange={handleSelectAll}
-                      className="rounded border-gray-300 dark:border-gray-600"
-                    />
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    User
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Activity
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Joined
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredUsers.map((user) => (
-                  <tr
-                    key={user._id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    <td className="px-6 py-4">
+            {/* Bulk Actions */}
+            {selectedUsers.length > 0 && (
+              <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {selectedUsers.length} users selected
+                </span>
+                <select
+                  value={bulkAction}
+                  onChange={(e) => setBulkAction(e.target.value)}
+                  className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                >
+                  <option value="">Choose bulk action...</option>
+                  <option value="activate">Activate Users</option>
+                  <option value="deactivate">Deactivate Users</option>
+                  <option value="verify">Mark as Verified</option>
+                  <option value="promote_paid">Promote to Premium</option>
+                  <option value="demote_user">Demote to User</option>
+                  <option value="export_selected">Export Selected</option>
+                </select>
+                <Button
+                  onClick={handleBulkAction}
+                  variant="secondary"
+                  className="text-sm"
+                  disabled={!bulkAction}
+                >
+                  Apply Action
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Users Table */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th className="w-8 px-6 py-3 text-left">
                       <input
                         type="checkbox"
-                        checked={selectedUsers.includes(user._id)}
-                        onChange={() => handleSelectUser(user._id)}
+                        checked={
+                          selectedUsers.length === filteredUsers.length &&
+                          filteredUsers.length > 0
+                        }
+                        onChange={handleSelectAll}
                         className="rounded border-gray-300 dark:border-gray-600"
                       />
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
-                          {user.email?.charAt(0).toUpperCase() || "U"}
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">
-                            {user.email}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      User
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Role
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Activity
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Joined
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {filteredUsers.map((user) => (
+                    <tr
+                      key={user._id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
+                      <td className="px-6 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.includes(user._id)}
+                          onChange={() => handleSelectUser(user._id)}
+                          className="rounded border-gray-300 dark:border-gray-600"
+                        />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
+                            {user.email?.charAt(0).toUpperCase() || "U"}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-4">
-                            {user.phone && (
-                              <span className="flex items-center gap-1">
-                                <FiPhone className="w-3 h-3" />
-                                {user.phone}
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              {user.email}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-4">
+                              {user.phone && (
+                                <span className="flex items-center gap-1">
+                                  <FiPhone className="w-3 h-3" />
+                                  {user.phone}
+                                </span>
+                              )}
+                              <span className="capitalize">
+                                {user.preferredLanguage}
+                              </span>
+                            </div>
+                            {user.profile?.region && (
+                              <div className="text-xs text-gray-400 dark:text-gray-500">
+                                {user.profile.region} •{" "}
+                                {user.profile.occupation}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
+                      <td className="px-6 py-4">
+                        <div className="space-y-1">
+                          {getVerificationStatus(user)}
+                          <div className="flex gap-2 text-xs">
+                            {user.isEmailVerified && (
+                              <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                                <FiMail className="w-3 h-3" />
+                                Email
                               </span>
                             )}
-                            <span className="capitalize">
-                              {user.preferredLanguage}
-                            </span>
+                            {user.isPhoneVerified && (
+                              <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                                <FiPhone className="w-3 h-3" />
+                                Phone
+                              </span>
+                            )}
                           </div>
-                          {user.profile?.region && (
-                            <div className="text-xs text-gray-400 dark:text-gray-500">
-                              {user.profile.region} • {user.profile.occupation}
-                            </div>
-                          )}
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
-                    <td className="px-6 py-4">
-                      <div className="space-y-1">
-                        {getVerificationStatus(user)}
-                        <div className="flex gap-2 text-xs">
-                          {user.isEmailVerified && (
-                            <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                              <FiMail className="w-3 h-3" />
-                              Email
-                            </span>
-                          )}
-                          {user.isPhoneVerified && (
-                            <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                              <FiPhone className="w-3 h-3" />
-                              Phone
-                            </span>
-                          )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        <div>
+                          <div className="font-medium">
+                            {user.usage.totalQueries} queries
+                          </div>
+                          <div className="text-xs">
+                            Last seen: {formatLastSeen(user.usage.lastActive)}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                      <div>
-                        <div className="font-medium">
-                          {user.usage.totalQueries} queries
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        {formatDate(user.createdAt)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleEditUser(user)}
+                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                            title="Edit User"
+                          >
+                            <FiEdit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user._id)}
+                            className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                            title="Delete User"
+                          >
+                            <FiTrash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                        <div className="text-xs">
-                          Last seen: {formatLastSeen(user.usage.lastActive)}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                      {formatDate(user.createdAt)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleEditUser(user)}
-                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                          title="Edit User"
-                        >
-                          <FiEdit3 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(user._id)}
-                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                          title="Delete User"
-                        >
-                          <FiTrash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          {/* Pagination */}
-          <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Showing {filteredUsers.length} of{" "}
-                {currentUsersData.pagination?.totalCount || 0} users
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={
-                    currentPage >=
-                    (currentUsersData.pagination?.totalPages || 1)
-                  }
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                >
-                  Next
-                </Button>
+            {/* Pagination */}
+            <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Showing {filteredUsers.length} of{" "}
+                  {currentUsersData.pagination?.totalCount || 0} users
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={
+                      currentPage >=
+                      (currentUsersData.pagination?.totalPages || 1)
+                    }
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Edit User Modal */}
-        <Modal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          title="Edit User"
-          size="lg"
-        >
-          {currentUser && (
-            <form className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="Email" value={currentUser.email || ""} disabled />
-                <Input label="Phone" value={currentUser.phone || ""} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Role
-                  </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                    {roles.map((role) => (
-                      <option
-                        key={role}
-                        value={role}
-                        selected={currentUser.role === role}
-                      >
-                        {role.replace("_", " ").toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Preferred Language
-                  </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                    {languages.map((lang) => (
-                      <option
-                        key={lang}
-                        value={lang}
-                        selected={currentUser.preferredLanguage === lang}
-                      >
-                        {lang.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Region"
-                  value={currentUser.profile?.region || ""}
-                />
-                <Input
-                  label="Occupation"
-                  value={currentUser.profile?.occupation || ""}
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={currentUser.isEmailVerified}
-                    className="rounded border-gray-300 dark:border-gray-600"
+          {/* Edit User Modal */}
+          <Modal
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            title="Edit User"
+            size="lg"
+          >
+            {currentUser && (
+              <form className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="Email"
+                    value={currentUser.email || ""}
+                    disabled
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    Email Verified
-                  </span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={currentUser.isPhoneVerified}
-                    className="rounded border-gray-300 dark:border-gray-600"
+                  <Input label="Phone" value={currentUser.phone || ""} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Role
+                    </label>
+                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                      {roles.map((role) => (
+                        <option
+                          key={role}
+                          value={role}
+                          selected={currentUser.role === role}
+                        >
+                          {role.replace("_", " ").toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Preferred Language
+                    </label>
+                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                      {languages.map((lang) => (
+                        <option
+                          key={lang}
+                          value={lang}
+                          selected={currentUser.preferredLanguage === lang}
+                        >
+                          {lang.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="Region"
+                    value={currentUser.profile?.region || ""}
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    Phone Verified
-                  </span>
-                </label>
-              </div>
-              <div className="flex justify-end gap-3 pt-4">
+                  <Input
+                    label="Occupation"
+                    value={currentUser.profile?.occupation || ""}
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={currentUser.isEmailVerified}
+                      className="rounded border-gray-300 dark:border-gray-600"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Email Verified
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={currentUser.isPhoneVerified}
+                      className="rounded border-gray-300 dark:border-gray-600"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Phone Verified
+                    </span>
+                  </label>
+                </div>
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowEditModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit">Save Changes</Button>
+                </div>
+              </form>
+            )}
+          </Modal>
+
+          {/* Bulk Action Confirmation Modal */}
+          <Modal
+            isOpen={showBulkModal}
+            onClose={() => setShowBulkModal(false)}
+            title="Confirm Bulk Action"
+            size="md"
+          >
+            <div className="space-y-4">
+              <p className="text-gray-600 dark:text-gray-400">
+                Are you sure you want to perform the action
+                {bulkAction.replace("_", " ")} on {selectedUsers.length}{" "}
+                selected users?
+              </p>
+              <div className="flex justify-end gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => setShowEditModal(false)}
+                  onClick={() => setShowBulkModal(false)}
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Save Changes</Button>
+                <Button
+                  onClick={executeBulkAction}
+                  disabled={bulkUpdate.isLoading}
+                >
+                  {bulkUpdate.isLoading ? <Spinner /> : "Confirm"}
+                </Button>
               </div>
-            </form>
-          )}
-        </Modal>
-
-        {/* Bulk Action Confirmation Modal */}
-        <Modal
-          isOpen={showBulkModal}
-          onClose={() => setShowBulkModal(false)}
-          title="Confirm Bulk Action"
-          size="md"
-        >
-          <div className="space-y-4">
-            <p className="text-gray-600 dark:text-gray-400">
-              Are you sure you want to perform the action
-              {bulkAction.replace("_", " ")} on {selectedUsers.length} selected
-              users?
-            </p>
-            <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setShowBulkModal(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={executeBulkAction}
-                disabled={bulkUpdate.isLoading}
-              >
-                {bulkUpdate.isLoading ? <Spinner /> : "Confirm"}
-              </Button>
             </div>
-          </div>
-        </Modal>
+          </Modal>
+        </div>
       </div>
-    </div>
+    </Suspense>
   );
 };
 
