@@ -1,5 +1,6 @@
 // "use client";
 
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -333,12 +334,14 @@ const CallToActionSection = () => {
 
 export default function HomePage() {
   return (
-    <div className="theme-transition">
-      <HeroSection />
-      <FeaturesSection />
-      <HowItWorksSection />
-      <CommunityStoriesSection />
-      <CallToActionSection />
-    </div>
+    <Suspense fallback={<Suspense />}>
+      <div className="theme-transition">
+        <HeroSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <CommunityStoriesSection />
+        <CallToActionSection />
+      </div>
+    </Suspense>
   );
 }
