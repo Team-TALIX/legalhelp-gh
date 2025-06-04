@@ -9,17 +9,16 @@ import LoadingBar from "../../../components/ui/LoadingBar";
 import { useAuth } from "../../../hooks/useAuth";
 import { FaCheckCircle, FaTimesCircle, FaMobile, FaRedo } from "react-icons/fa";
 
-const VerifyPhonePage = memo(function VerifyPhonePage() {
+const VerifyPhonePageContent = memo(function VerifyPhonePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [verificationStatus, setVerificationStatus] = useState("input"); // input, loading, success, error, redirecting
+  const [verificationStatus, setVerificationStatus] = useState("input");
   const [message, setMessage] = useState("");
   const [code, setCode] = useState("");
   const [phone, setPhone] = useState("");
   const [countdown, setCountdown] = useState(0);
   const [isResending, setIsResending] = useState(false);
-  
-  // Only keep the useAuth hooks that are actually used
+
   const {
     verifyPhone,
     sendPhoneVerification,
@@ -31,12 +30,10 @@ const VerifyPhonePage = memo(function VerifyPhonePage() {
 
   // Check if phone was passed in URL
   useEffect(() => {
-    const phoneParam = searchParams.get("phone");
+    const phoneParam = searchParams?.get("phone");
     if (phoneParam) {
       setPhone(phoneParam);
     }
-
-    // Clear any previous errors on mount
     clearError();
   }, [searchParams, clearError]);
 
@@ -48,9 +45,7 @@ const VerifyPhonePage = memo(function VerifyPhonePage() {
     }
   }, [countdown]);
 
-  // Memoize handlers to prevent recreating functions on every render
   const handleCodeChange = useCallback((e) => {
-    // Only allow digits and limit to 6 characters
     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
     setCode(value);
   }, []);
@@ -78,7 +73,6 @@ const VerifyPhonePage = memo(function VerifyPhonePage() {
         setVerificationStatus("success");
         setMessage("Your phone number has been successfully verified!");
 
-        // If user is now fully verified, we'll redirect to dashboard
         if (isFullyVerified()) {
           setTimeout(() => {
             setVerificationStatus("redirecting");
@@ -119,7 +113,7 @@ const VerifyPhonePage = memo(function VerifyPhonePage() {
       const response = await sendPhoneVerification(phone);
       if (response.success) {
         setMessage("A new verification code has been sent to your phone.");
-        setCountdown(60); // 60 seconds cooldown
+        setCountdown(60);
       } else {
         setMessage(response.message || "Failed to resend verification code.");
       }
@@ -135,7 +129,6 @@ const VerifyPhonePage = memo(function VerifyPhonePage() {
     }
   }, [phone, sendPhoneVerification, authError]);
 
-  // Memoize the content rendering to prevent unnecessary re-renders
   const renderContent = useCallback(() => {
     switch (verificationStatus) {
       case "input":
@@ -293,21 +286,32 @@ const VerifyPhonePage = memo(function VerifyPhonePage() {
   ]);
 
   return (
-    <Suspense fallback={<Spinner />}>
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 text-center">
-          <div className="flex justify-center mb-6">
-            <div className="rounded-full bg-primary-100 dark:bg-primary-900 p-4">
-              <FaMobile className="h-10 w-10 text-primary-600 dark:text-primary-300" />
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 text-center">
+        <div className="flex justify-center mb-6">
+          <div className="rounded-full bg-primary-100 dark:bg-primary-900 p-4">
+            <FaMobile className="h-10 w-10 text-primary-600 dark:text-primary-300" />
           </div>
-          
-            {renderContent()}
-          
         </div>
+
+        {renderContent()}
       </div>
-    </Suspense>
+    </div>
   );
 });
+
+function VerifyPhonePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+          <Spinner />
+        </div>
+      }
+    >
+      <VerifyPhonePageContent />
+    </Suspense>
+  );
+}
 
 export default VerifyPhonePage;
